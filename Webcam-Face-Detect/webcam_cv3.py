@@ -10,6 +10,7 @@ log.basicConfig(filename='webcam.log',level=log.INFO)
 
 video_capture = cv2.VideoCapture(0)
 anterior = 0
+key = cv2.waitKey(0)
 
 while True:
     if not video_capture.isOpened():
@@ -47,11 +48,12 @@ while True:
 
     # Display the resulting frame
     cv2.imshow('Video', frame)
-
-    for (x,y,w,h) in faces :
-    path = os.path.sep.join([output_dir, "{}.jpg".format(str(total).zfill(8))])
-    crop_face = frame[y:y+h, x:x+w]
-    cv2.imwrite(crop_face,)
+    if key == ord('c'):
+        for (x,y,w,h) in faces :
+        path = os.path.sep.join([output_dir, "{}.jpg".format(str(total).zfill(8))])
+        crop_face = frame[y:y+h, x:x+w]
+        cv2.imwrite(crop_face,)
+        print("hello")
 
 # When everything is done, release the capture
 video_capture.release()
