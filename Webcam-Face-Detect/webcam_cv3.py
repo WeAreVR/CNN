@@ -26,7 +26,7 @@ while True:
         gray,
         scaleFactor=1.1,
         minNeighbors=5,
-        minSize=(30, 50)
+        minSize=(30, 30)
     )
 
     # Draw a rectangle around the faces
@@ -47,6 +47,11 @@ while True:
 
     # Display the resulting frame
     cv2.imshow('Video', frame)
+
+    for (x,y,w,h) in faces :
+    path = os.path.sep.join([output_dir, "{}.jpg".format(str(total).zfill(8))])
+    crop_face = frame[y:y+h, x:x+w]
+    cv2.imwrite(crop_face,)
 
 # When everything is done, release the capture
 video_capture.release()
