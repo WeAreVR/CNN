@@ -3,6 +3,7 @@ import sys
 import logging as log
 import datetime as dt
 from time import sleep
+import os
 
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
@@ -10,7 +11,6 @@ log.basicConfig(filename='webcam.log',level=log.INFO)
 
 video_capture = cv2.VideoCapture(0)
 anterior = 0
-key = cv2.waitKey(0)
 
 while True:
     if not video_capture.isOpened():
@@ -46,14 +46,27 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+
+    if cv2.waitKey(1) & 0xFF == ord('w'):
+        for (x,y,w,h) in faces :
+            crop_img = frame[y: y + h, x: x + w] # Crop from x, y, w, h -> 100, 200, 300, 400
+            cv2.imwrite("face.jpg", crop_img)
+            print("hello")
+        break
+
+
     # Display the resulting frame
     cv2.imshow('Video', frame)
+    #print("hejsa")
+    key = cv2.waitKey(1)
     if key == ord('c'):
         for (x,y,w,h) in faces :
-        path = os.path.sep.join([output_dir, "{}.jpg".format(str(total).zfill(8))])
-        crop_face = frame[y:y+h, x:x+w]
-        cv2.imwrite(crop_face,)
-        print("hello")
+            path = os.path.sep.join([output_dir, "{}.jpg".format(str(total).zfill(8))])
+            crop_face = frame[y:y+h, x:x+w]
+            #cv2.imwrite(crop_face, )
+            cv2.imwrite(r'C:\Users\louis\OneDrive - Roskilde Universitet\Webcam-Face-Detect', crop_face)
+            print("hello")
+            #python webcam_cv3.py haarcascade_frontalface_default.xml
 
 # When everything is done, release the capture
 video_capture.release()
