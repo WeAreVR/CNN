@@ -59,7 +59,8 @@ while True:
     cv2.imshow('Video', frame)
     #print("hejsa")
     key = cv2.waitKey(1)
-    if key == ord('c'):
+    def takePicture():
+        #if key == ord('c'):
         for (x,y,w,h) in faces :
             path = os.path.sep.join([output_dir, "{}.jpg".format(str(total).zfill(8))])
             crop_face = frame[y:y+h, x:x+w]
