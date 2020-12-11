@@ -3,11 +3,15 @@ import cv2
 import sys
 import logging as log
 import datetime as dt
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from keras.preprocessing import image
 import tkinter as tk
 from time import sleep
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageOps
 import os
 
+result_emotion ="ingenting"
 
 #Set up GUI
 window = tk.Tk()  #Makes main window
@@ -22,11 +26,49 @@ cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
 
 
+
+def predict_and_save_graph():
+    #imports skal måske være i GUI?
+    class_names = ['Angry',
+                   'Disgust',
+                   'Fear',
+                   'Happy',
+                   'Neutral',
+                   'Sad',
+                   'Surprise']
+
+    #load den trænede model fra filsti
+    loaded_model = tf.keras.models.load_model(r'C:\Users\Mathi\Documents\GitHub\CNN\save models')
+
+    #load face.jpg
+    test_image = image.load_img(r'C:\Users\Mathi\Documents\GitHub\CNN\Webcam-Face-Detect\face.jpg', target_size = (48, 48))
+    test_image = ImageOps.grayscale(test_image)
+    test_image = image.img_to_array(test_image)
+    test_image = np.expand_dims(test_image, axis = 0)
+
+    #predict med loaded_model
+    result = loaded_model.predict(test_image, steps=1)
+    #result_emotion = kategori med højst prob.
+    result_emotion = result.argmax(axis=-1)
+    #result_emotion = class_names[result_emotion]
+    result = result.tolist()
+    result = result[0]
+    print(result_emotion)
+    #lav (og gem) søjlediagram med predict results
+    plt.title('Mood')
+    plt.ylabel('Accuracy')
+    fig = plt.bar(class_names, result)
+    plt.savefig('barGraph.png')
+    print("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+
+
+
+
+
 #Capture video frames
 
 cap = cv2.VideoCapture(0)
-
-mood = "test1"
+mood = result_emotion
 
 def show_frame():
     _, frame = cap.read()
@@ -47,10 +89,7 @@ def show_frame():
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
     
-    #if cv2.waitKey(1) & 0xFF == ord('w'):
-    
-    
-    
+    if cv2.waitKey(1) & 0xFF == ord('w'):
         for (x,y,w,h) in faces :
             crop_img = frame[y: y + h, x: x + w] # Crop from x, y, w, h -> 100, 200, 300, 400
             
@@ -62,24 +101,25 @@ def show_frame():
             img = tk.Label(yellowFrame, image = render)
             img.image = render
             img.place(x=1, y=1)
-            print("hello")
             
-            cv2.imwrite("graph.jpg", crop_img)
-            graphRoute = r"C:\Users\Mathi\Documents\GitHub\CNN\Webcam-Face-Detect\graph.jpg"
+            predict_and_save_graph()
+            #cv2.imwrite("graph.jpg", crop_img)  # skal slettes når vi bliver trætte af den
+            graphRoute = r"C:\Users\Mathi\Documents\GitHub\CNN\barGraph.png"
             load = Image.open(graphRoute)
             load = load.resize((180, 180), Image.ANTIALIAS)
             render = ImageTk.PhotoImage(load)
             img = tk.Label(redFrame, image = render)
             img.image = render
             img.place(x=1, y=1)
-            print("hello")
-            
+            moodLabel = tk.Label(redFrame, text = mood, bg = "red")
+            moodLabel.place(relx = 0.7, rely = 0.1, anchor = "center")
     
     # Display the resulting frame
     cv2.imshow('window', frame)
     display2.imgtk = imgtk #Shows frame for display 2
     display2.configure(image=imgtk)
     window.after(10, show_frame)
+    
     
 
     
@@ -90,23 +130,35 @@ display1.grid(row=1, column=0, padx=10, pady=2)  #Display 1
 blueFrame = tk.Frame(window, bg = "blue")
 blueFrame.place(rely = 0.1, relwidth = 0.5, relheight = 0.8)
 
-
 yellowFrame = tk.Frame(window, bg = "yellow")
 yellowFrame.place(relx = 0.5, rely = 0.1, relwidth = 0.5, relheight = 0.4)
-
 
 
 redFrame = tk.Frame(window, bg = "red")
 redFrame.place(relx = 0.5, rely = 0.5, relwidth = 0.5, relheight = 0.4)
 
-moodLabel = tk.Label(redFrame, text = mood, bg = "red")
-moodLabel.place(relx = 0.5, rely = 0.1, anchor = "center")
 
 
 display2 = tk.Label(blueFrame)
 display2.grid(row=3, column=3) #Display 2
 
+def pauseActivate(activated):
+    if activated == True:
+        activated = False
+        print("falsk")
+        return activated
+    else:
+        activated = True
+        print("sandt")
+        return activated
+        
 
+var = tk.IntVar()
 
-show_frame() #Display
+Start=tk.Radiobutton(window, text="Start", variable = var, value = 1)
+Start.grid(row=5,column=5)
+Sluk=tk.Radiobutton(window, text="Sluk", variable = var, value = 2)
+Sluk.grid(row=6,column=5)
+
+show_frame() #Display    
 window.mainloop()  #Starts GUI
