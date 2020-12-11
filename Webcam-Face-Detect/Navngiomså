@@ -1,0 +1,112 @@
+import numpy as np
+import cv2
+import sys
+import logging as log
+import datetime as dt
+import tkinter as tk
+from time import sleep
+from PIL import Image, ImageTk
+import os
+
+
+#Set up GUI
+window = tk.Tk()  #Makes main window
+window.wm_title("Video")
+window.config(background="#FFFFFF")
+
+#Graphics window
+imageFrame = tk.Frame(window, width=1400, height=1800)
+imageFrame.grid(row=2, column=2, padx=50, pady=20)
+
+cascPath = "haarcascade_frontalface_default.xml"
+faceCascade = cv2.CascadeClassifier(cascPath)
+
+
+#Capture video frames
+
+cap = cv2.VideoCapture(0)
+
+mood = "test1"
+
+def show_frame():
+    _, frame = cap.read()
+    frame = cv2.flip(frame, 1)
+    cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
+    img = Image.fromarray(cv2image)
+    imgtk = ImageTk.PhotoImage(image=img)
+            
+    faces = faceCascade.detectMultiScale(
+        cv2image,
+        scaleFactor=1.1,
+        minNeighbors=10,
+        minSize=(64, 64)
+    )
+    
+    # Draw a rectangle around the faces
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+    
+    #if cv2.waitKey(1) & 0xFF == ord('w'):
+    
+    
+    
+        for (x,y,w,h) in faces :
+            crop_img = frame[y: y + h, x: x + w] # Crop from x, y, w, h -> 100, 200, 300, 400
+            
+            cv2.imwrite("face.jpg", crop_img)
+            faceRoute = r"C:\Users\Mathi\Documents\GitHub\CNN\Webcam-Face-Detect\face.jpg"
+            load = Image.open(faceRoute)
+            load = load.resize((180, 180), Image.ANTIALIAS)
+            render = ImageTk.PhotoImage(load)
+            img = tk.Label(yellowFrame, image = render)
+            img.image = render
+            img.place(x=1, y=1)
+            print("hello")
+            
+            cv2.imwrite("graph.jpg", crop_img)
+            graphRoute = r"C:\Users\Mathi\Documents\GitHub\CNN\Webcam-Face-Detect\graph.jpg"
+            load = Image.open(graphRoute)
+            load = load.resize((180, 180), Image.ANTIALIAS)
+            render = ImageTk.PhotoImage(load)
+            img = tk.Label(redFrame, image = render)
+            img.image = render
+            img.place(x=1, y=1)
+            print("hello")
+            
+    
+    # Display the resulting frame
+    cv2.imshow('window', frame)
+    display2.imgtk = imgtk #Shows frame for display 2
+    display2.configure(image=imgtk)
+    window.after(10, show_frame)
+    
+
+    
+display1 = tk.Label(imageFrame)
+display1.grid(row=1, column=0, padx=10, pady=2)  #Display 1
+
+ 
+blueFrame = tk.Frame(window, bg = "blue")
+blueFrame.place(rely = 0.1, relwidth = 0.5, relheight = 0.8)
+
+
+yellowFrame = tk.Frame(window, bg = "yellow")
+yellowFrame.place(relx = 0.5, rely = 0.1, relwidth = 0.5, relheight = 0.4)
+
+
+
+redFrame = tk.Frame(window, bg = "red")
+redFrame.place(relx = 0.5, rely = 0.5, relwidth = 0.5, relheight = 0.4)
+
+moodLabel = tk.Label(redFrame, text = mood, bg = "red")
+moodLabel.place(relx = 0.5, rely = 0.1, anchor = "center")
+
+
+display2 = tk.Label(blueFrame)
+display2.grid(row=3, column=3) #Display 2
+
+
+
+show_frame() #Display
+window.mainloop()  #Starts GUI
