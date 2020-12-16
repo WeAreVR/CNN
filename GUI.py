@@ -107,6 +107,7 @@ def show_frame():
         for (x,y,w,h) in faces :
             crop_img = frame[y: y + h, x: x + w] # Crop from x, y, w, h -> 100, 200, 300, 400
             
+            
             cv2.imwrite("webcam images/face.jpg", crop_img)
             faceRoute = "webcam images/face.jpg"
             load = Image.open(faceRoute)
@@ -139,21 +140,18 @@ def show_frame():
     
 display1 = tk.Label(imageFrame)
 display1.grid(row=1, column=0, padx=10, pady=2)  #Display 1
-
-
  
-blueFrame = tk.Frame(window, bg = "blue")
+blueFrame = tk.Frame(window, bg = "blue", borderwidth=3, relief="solid")
 blueFrame.place(rely = 0.1, relwidth = 0.5, relheight = 0.8)
 
-yellowFrame = tk.Frame(window, bg = "yellow")
+yellowFrame = tk.Frame(window, bg = "yellow", borderwidth=3, relief="solid")
 yellowFrame.place(relx = 0.5, rely = 0.1, relwidth = 0.5, relheight = 0.4)
-
 
 moodLabel = tk.Label(window, textvariable=v, bg = "yellow")
 moodLabel.config(font=("Courier", 44))
 moodLabel.place(relx = 0.84, rely = 0.2, anchor = "center")
 
-redFrame = tk.Frame(window, bg = "red")
+redFrame = tk.Frame(window, bg = "red", borderwidth=3, relief="solid")
 redFrame.place(relx = 0.5, rely = 0.5, relwidth = 0.5, relheight = 0.4)
 
 
