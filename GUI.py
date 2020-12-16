@@ -151,7 +151,7 @@ yellowFrame.place(relx = 0.5, rely = 0.1, relwidth = 0.5, relheight = 0.4)
 
 moodLabel = tk.Label(window, textvariable=v, bg = "yellow")
 moodLabel.config(font=("Courier", 44))
-moodLabel.place(relx = 0.8, rely = 0.2, anchor = "center")
+moodLabel.place(relx = 0.84, rely = 0.2, anchor = "center")
 
 redFrame = tk.Frame(window, bg = "red")
 redFrame.place(relx = 0.5, rely = 0.5, relwidth = 0.5, relheight = 0.4)
