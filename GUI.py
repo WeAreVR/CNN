@@ -1,38 +1,34 @@
 import numpy as np
 import cv2
 import matplotlib
-import sys
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from keras.preprocessing import image
 import tkinter as tk
 from time import sleep
 from PIL import Image, ImageTk, ImageOps
-import os
 
 result_emotion = "ingenting"
 
-#Set up GUI
-window = tk.Tk()  #Makes main window
+#GUI Set up 
+window = tk.Tk()  #Laver et nyt vindue
 window.wm_title("Video")
 window.config(background="#FFFFFF")
 
-#Graphics window
 imageFrame = tk.Frame(window, width=1400, height=1800)
 imageFrame.grid(row=2, column=2, padx=50, pady=20)
 
-window.geometry("1300x1150+300+300")
 
+window.geometry("1300x1150+300+1")
+
+#placering til opfanget ansigter
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
-
-matplotlib.use('Agg')
 
 v = tk.StringVar()
 
 
 def predict_and_save_graph():
-    #imports skal måske være i GUI?
     class_names = ['Angry',
                    'Disgust',
                    'Fear',
@@ -54,11 +50,9 @@ def predict_and_save_graph():
     result = loaded_model.predict(test_image, steps=1)
     #result_emotion = kategori med højst prob.
     result_emotion = result.argmax(axis=-1)
-    #result_emotion = class_names[result_emotion]
     result = result.tolist()
     result = result[0]
     tal = result_emotion
-    #result_emotion = class_names[tal]
     class_names = np.array(['Angry',
                    'Disgust',
                    'Fear',
@@ -75,15 +69,19 @@ def predict_and_save_graph():
     plt.clf()
     v.set(class_names[result_emotion])
 
-#Capture video frames
+#Optag video vindue
 
 cap = cv2.VideoCapture(0)
 mood = result_emotion
+
+# Fejlsending hvis webcam ikke er aktivt/ fundet
 while not cap.isOpened():
     print('Unable to load camera.')
     sleep(5)
     cap = cv2.VideoCapture(0)
     pass
+
+# Viser optagelsesvindue med firkanter om ansigter, og viser fotograferet ansigt med tilsvarende graf
 def show_frame():
     _, frame = cap.read()
     frame = cv2.flip(frame, 1)
@@ -98,16 +96,16 @@ def show_frame():
         minSize=(64, 64)
     )
     
-    # Draw a rectangle around the faces
+    # Tegner firkanter om ansigter
     for (x, y, w, h) in faces:
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
     
     if cv2.waitKey(1) & 0xFF == ord('w'):
         for (x,y,w,h) in faces :
-            crop_img = frame[y: y + h, x: x + w] # Crop from x, y, w, h -> 100, 200, 300, 400
-            
-            
+            crop_img = frame[y: y + h, x: x + w] # udklip fra x, y, w, h -> 100, 200, 300, 400
+             
+            # Gemmer ansigt på sti, samt viser det i vindue
             cv2.imwrite("webcam images/face.jpg", crop_img)
             faceRoute = "webcam images/face.jpg"
             load = Image.open(faceRoute)
@@ -117,8 +115,8 @@ def show_frame():
             img.image = render
             img.place(x=1, y=1)
             
+            # Viser graf i vindue, tilhørende nyeligt taget billede 
             predict_and_save_graph()
-            #cv2.imwrite("graph.jpg", crop_img)  # skal slettes når vi bliver trætte af den
             graphRoute = "webcam images/predictedGraph.png"
             load = Image.open(graphRoute)
             load = load.resize((420, 360), Image.ANTIALIAS)
@@ -129,15 +127,15 @@ def show_frame():
            
                       
     
-    # Display the resulting frame
+    # Viser resulterende vindue
     cv2.imshow('window', frame)
-    display2.imgtk = imgtk #Shows frame for display 2
+    display2.imgtk = imgtk #Viser rammen for display2
     display2.configure(image=imgtk)
     window.after(10, show_frame)
     
     
 
-    
+# Skaber baggrunde til opdeling af vindue    
 display1 = tk.Label(imageFrame)
 display1.grid(row=1, column=0, padx=10, pady=2)  #Display 1
  
@@ -153,7 +151,6 @@ moodLabel.place(relx = 0.84, rely = 0.2, anchor = "center")
 
 redFrame = tk.Frame(window, bg = "red", borderwidth=3, relief="solid")
 redFrame.place(relx = 0.5, rely = 0.5, relwidth = 0.5, relheight = 0.4)
-
 
 
 
